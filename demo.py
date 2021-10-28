@@ -1,16 +1,9 @@
 import shutil
 import time
-from datetime import datetime
-from pathlib import Path
+
 
 from watchdog.events import PatternMatchingEventHandler
 from watchdog.observers import Observer
-
-
-def get_date_time_stamp():
-    today = datetime.now()
-    timestamp = str(today.timestamp()).split('.')[0]
-    return f'{today:%m_%d_%Y}_{timestamp}'
 
 
 class FolderHandler(PatternMatchingEventHandler):
@@ -22,8 +15,9 @@ class FolderHandler(PatternMatchingEventHandler):
     def on_created(self, event):
         # to prevent PermissionError: [Errno 13] Permission denied:
         time.sleep(1)
-        
-        shutil.move(event.src_path, self.target_folder) # move source file to target folder
+
+        # move source file to target folder
+        shutil.move(event.src_path, self.target_folder)
 
 
 if __name__ == '__main__':
@@ -43,8 +37,10 @@ if __name__ == '__main__':
 
     for _, folder in folders.items():
         # patterns: txt file only
-        event_handler = FolderHandler(target_folder=folder['target_folder'], patterns=['*.txt'],  ignore_directories=True, case_sensitive=False)
-        observer.schedule(event_handler,  folder['source_folder'],  recursive=True)
+        event_handler = FolderHandler(target_folder=folder['target_folder'], patterns=[
+                                      '*.txt'],  ignore_directories=True, case_sensitive=False)
+        observer.schedule(
+            event_handler,  folder['source_folder'],  recursive=True)
 
     observer.start()
 
